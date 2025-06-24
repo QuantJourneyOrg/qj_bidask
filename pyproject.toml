@@ -1,0 +1,89 @@
+[build-system]
+requires = ["setuptools>=45", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "quantjourney-bidask"
+dynamic = ["version"]
+description = "Efficient bid-ask spread estimator from OHLC prices"
+readme = "README.md"
+license = {text = "MIT"}
+authors = [
+    {name = "Jakub Polec", email = "jakub@quantjourney.pro"}
+]
+maintainers = [
+    {name = "Jakub Polec", email = "jakub@quantjourney.pro"}
+]
+keywords = ["finance", "bid-ask", "spread", "trading", "quantitative", "OHLC"]
+classifiers = [
+    "Development Status :: 4 - Beta",
+    "Intended Audience :: Financial and Insurance Industry",
+    "License :: OSI Approved :: MIT License",
+    "Operating System :: OS Independent",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.8",
+    "Programming Language :: Python :: 3.9",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Topic :: Office/Business :: Financial",
+    "Topic :: Scientific/Engineering :: Mathematics",
+]
+requires-python = ">=3.8"
+dependencies = [
+    "numpy>=1.20",
+    "pandas>=1.5",
+    "requests>=2.28",
+    "yfinance>=0.2",
+    "matplotlib>=3.5",
+    "plotly>=5.0",
+    "websocket-client>=1.0"
+]
+
+[project.optional-dependencies]
+dev = [
+    "pytest>=7.0",
+    "pytest-mock>=3.10",
+    "pytest-cov>=4.0",
+    "ruff>=0.1",
+    "mypy>=1.0",
+    "black>=22.0",
+    "isort>=5.0"
+]
+examples = [
+    "jupyter>=1.0",
+    "ipywidgets>=7.0"
+]
+
+[project.urls]
+Homepage = "https://github.com/QuantJourneyOrg/qj_bidask"
+Documentation = "https://github.com/QuantJourneyOrg/qj_bidask#readme"
+Repository = "https://github.com/QuantJourneyOrg/qj_bidask"
+"Bug Tracker" = "https://github.com/QuantJourneyOrg/qj_bidask/issues"
+
+[tool.setuptools.packages.find]
+where = ["."]
+include = ["quantjourney_bidask*"]
+
+[tool.setuptools.dynamic]
+version = {attr = "quantjourney_bidask._version.__version__"}
+
+[tool.ruff]
+line-length = 88
+target-version = "py38"
+
+[tool.ruff.lint]
+select = ["E", "F", "W", "C90", "I", "N", "D", "UP", "S", "B", "A", "C4", "PIE", "SIM"]
+ignore = ["D100", "D104", "D105", "D107"]
+
+[tool.mypy]
+python_version = "3.8"
+warn_return_any = true
+warn_unused_configs = true
+disallow_untyped_defs = true
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+python_files = ["test_*.py"]
+python_classes = ["Test*"]
+python_functions = ["test_*"]
