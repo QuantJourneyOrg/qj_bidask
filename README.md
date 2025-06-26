@@ -13,7 +13,10 @@ This library is designed for quantitative finance professionals, researchers, an
 ## Features
 
 - **Efficient Spread Estimation**: Implements the EDGE estimator for single, rolling, and expanding windows.
-- **Data Integration**: Fetch OHLC data from Binance (via custom FastAPI server) and Yahoo Finance (via yfinance).
+- **Real-Time Data**: Websocket support for live cryptocurrency data from Binance and other exchanges.
+- **Data Integration**: Fetch OHLC data from Yahoo Finance and generate synthetic data for testing.
+- **Live Monitoring**: Real-time spread monitoring with animated visualizations.
+- **Local Development**: Works completely locally without cloud dependencies.
 - **Robust Handling**: Supports missing values, non-positive prices, and various data frequencies.
 - **Comprehensive Tests**: Extensive unit tests with known test cases from the original paper.
 - **Clear Documentation**: Detailed docstrings and usage examples.
@@ -24,6 +27,14 @@ Install the library via pip:
 
 ```bash
 pip install quantjourney-bidask
+```
+
+For development (local setup):
+
+```bash
+git clone https://github.com/QuantJourneyOrg/qj_bidask
+cd qj_bidask
+pip install -e .
 ```
 
 ## Quick Start
@@ -48,42 +59,79 @@ print(f"Estimated bid-ask spread: {spread:.6f}")
 
 ```python
 from quantjourney_bidask import edge_rolling
+import pandas as pd
+
+# Create DataFrame with OHLC data
+df = pd.DataFrame({
+    'open': open_prices,
+    'high': high_prices,
+    'low': low_prices,
+    'close': close_prices
+})
 
 # Calculate rolling spreads with a 20-period window
-rolling_spreads = edge_rolling(
-    open_prices, high_prices, low_prices, close_prices, 
-    window=20
-)
+rolling_spreads = edge_rolling(df, window=20)
 print(f"Rolling spreads: {rolling_spreads}")
 ```
 
 ### Data Fetching Integration
 
 ```python
-from quantjourney_bidask import fetch_yfinance_data, edge
+from data.fetch import fetch_yfinance_data
+from quantjourney_bidask import edge_rolling
 
 # Fetch OHLC data for a stock
-data = fetch_yfinance_data("AAPL", period="1mo", interval="1h")
+df = fetch_yfinance_data(["AAPL"], period="1mo", interval="1d")
 
-# Calculate spread from fetched data
-spread = edge(data['Open'], data['High'], data['Low'], data['Close'])
-print(f"AAPL spread estimate: {spread:.6f}")
+# Calculate rolling spread from fetched data
+spreads = edge_rolling(df, window=20)
+print(f"AAPL average spread: {spreads.mean():.6f}")
 ```
 
-### Live Monitoring
+### Real-Time Spread Monitoring
 
 ```python
-from quantjourney_bidask import LiveSpreadMonitor
+from data.fetch import create_spread_monitor
 
-# Monitor live spreads for cryptocurrency
-monitor = LiveSpreadMonitor("BTCUSDT", window=100)
-monitor.start()
+# Create real-time spread monitor
+monitor = create_spread_monitor(["BTCUSDT", "ETHUSDT"], window=20)
 
-# Get current spread estimate
-current_spread = monitor.get_current_spread()
-print(f"Current BTC/USDT spread: {current_spread:.6f}")
+# Add callback for spread updates
+def print_spread_update(spread_data):
+    print(f"{spread_data['symbol']}: {spread_data['spread_bps']:.2f} bps")
 
-monitor.stop()
+monitor.add_spread_callback(print_spread_update)
+
+# Start monitoring (uses websockets for live data)
+monitor.start_monitoring("1m")
+```
+
+### Animated Real-Time Dashboard
+
+```python
+# Run the real-time dashboard
+python examples/realtime_spread_monitor.py --mode dashboard
+
+# Or console mode
+python examples/realtime_spread_monitor.py --mode console
+```
+
+## Examples
+
+The `examples/` directory contains comprehensive examples:
+
+- `spread_estimator.py` - Basic spread estimation examples
+- `spread_monitor.py` - Spread monitoring with threshold alerts
+- `realtime_spread_monitor.py` - Live websocket monitoring with animation
+- `crypto_spread_comparison.py` - Multi-asset spread comparison
+- `liquidity_risk_monitor.py` - Liquidity risk monitoring
+- `stock_liquidity_risk.py` - Stock-specific liquidity analysis
+
+Run any example:
+
+```bash
+python examples/spread_estimator.py
+python examples/realtime_spread_monitor.py
 ```
 
 ## API Reference
@@ -91,25 +139,45 @@ monitor.stop()
 ### Core Functions
 
 - `edge(open, high, low, close, sign=False)`: Single-period spread estimation
-- `edge_rolling(open, high, low, close, window, min_periods=None)`: Rolling window estimation
-- `edge_expanding(open, high, low, close, min_periods=3)`: Expanding window estimation
+- `edge_rolling(df, window, min_periods=None)`: Rolling window estimation  
+- `edge_expanding(df, min_periods=3)`: Expanding window estimation
 
-### Data Fetching
+### Data Fetching (`data/fetch.py`)
 
-- `fetch_yfinance_data(symbol, period, interval)`: Fetch data from Yahoo Finance
-- `fetch_binance_data(symbol, interval, limit)`: Fetch data from Binance API
+- `fetch_yfinance_data(tickers, period, interval)`: Fetch real market data from Yahoo Finance
+- `generate_synthetic_crypto_data(symbols, hours, interval_minutes)`: Generate synthetic crypto data
+- `fetch_binance_data(*args, **kwargs)`: Compatibility function (returns synthetic data)
+- `create_realtime_stream(symbols, exchange)`: Create websocket data stream
+- `create_spread_monitor(symbols, window)`: Create real-time spread monitor
 
-### Live Monitoring
+### Real-Time Classes
 
-- `LiveSpreadMonitor(symbol, window)`: Real-time spread monitoring via WebSocket
+- `RealTimeDataStream`: Websocket data streaming for live market data
+- `RealTimeSpreadMonitor`: Real-time spread calculation and monitoring
+- `AnimatedSpreadMonitor`: Animated real-time visualization
 
 ## Requirements
 
-- Python >= 3.8
+- Python >= 3.11
 - numpy >= 1.20
 - pandas >= 1.5
 - requests >= 2.28
 - yfinance >= 0.2
+- matplotlib >= 3.5
+- websocket-client >= 1.0
+
+## WebSocket Support
+
+The library supports real-time data via websockets:
+
+- **Binance**: `wss://stream.binance.com:9443/ws/` (cryptocurrency data)
+- **Fallback**: Synthetic data generation for testing when websockets unavailable
+
+Real-time features:
+- Live spread calculation
+- Animated visualizations
+- Threshold alerts
+- Multi-symbol monitoring
 
 ## Academic Citation
 
@@ -134,6 +202,20 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 ## Contributing
 
 Contributions are welcome! Please feel free to submit a Pull Request. For major changes, please open an issue first to discuss what you would like to change.
+
+### Development Setup
+
+```bash
+git clone https://github.com/QuantJourneyOrg/qj_bidask
+cd qj_bidask
+pip install -e ".[dev]"
+
+# Run tests
+pytest
+
+# Run examples
+python examples/realtime_spread_monitor.py
+```
 
 ## Support
 

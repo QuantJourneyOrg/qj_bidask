@@ -1,4 +1,11 @@
-from quantjourney_bidask import fetch_yfinance_data
+
+import sys
+sys.path.insert(0, './data')
+from quantjourney_bidask import edge_rolling
+from fetch import fetch_yfinance_data
+
+
+
 
 # Fetch Yahoo Finance data
 yf_df = fetch_yfinance_data(

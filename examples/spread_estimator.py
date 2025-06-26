@@ -9,7 +9,14 @@ for estimating bid-ask spreads from OHLC data.
 import pandas as pd
 import matplotlib.pyplot as plt
 import numpy as np
-from quantjourney_bidask import edge, edge_rolling, edge_expanding, fetch_yfinance_data
+import sys
+import os
+
+# Add parent directory to path to access data module
+sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+
+from quantjourney_bidask import edge, edge_rolling, edge_expanding
+from data.fetch import fetch_yfinance_data
 
 print("Spread Estimator Examples")
 print("========================")

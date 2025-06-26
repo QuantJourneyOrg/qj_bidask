@@ -1,0 +1,357 @@
+#!/usr/bin/env python3
+"""
+Real-Time Spread Monitor with WebSocket Data
+
+Demonstrates real-time monitoring of bid-ask spreads using live websocket data
+with animated visualizations.
+"""
+
+import matplotlib.pyplot as plt
+import matplotlib.animation as animation
+import pandas as pd
+import numpy as np
+from datetime import datetime, timedelta
+from collections import deque
+import sys
+import os
+import time
+import threading
+
+# Add parent directory to path for imports
+sys.path.append(os.path.join(os.path.dirname(__file__), '..'))
+
+from data.fetch import create_spread_monitor, RealTimeSpreadMonitor
+from typing import List
+from quantjourney_bidask import edge_rolling
+
+class AnimatedSpreadMonitor:
+    """
+    Animated real-time spread monitor with live plotting.
+    """
+    
+    def __init__(self, symbols: List[str], max_points: int = 100):
+        self.symbols = symbols
+        self.max_points = max_points
+        
+        # Data storage for plotting
+        self.data_history = {
+            symbol: {
+                'timestamps': deque(maxlen=max_points),
+                'prices': deque(maxlen=max_points),
+                'spreads': deque(maxlen=max_points),
+                'volumes': deque(maxlen=max_points)
+            } for symbol in symbols
+        }
+        
+        # Set up the plot
+        self.fig, self.axes = plt.subplots(len(symbols), 2, figsize=(15, 6*len(symbols)))
+        if len(symbols) == 1:
+            self.axes = self.axes.reshape(1, -1)
+        
+        self.lines = {}
+        self.setup_plots()
+        
+        # Create spread monitor
+        self.monitor = create_spread_monitor(symbols, window=20)
+        self.monitor.add_spread_callback(self.update_data)
+        
+        # Animation
+        self.animation = None
+        
+    def setup_plots(self):
+        """Set up the matplotlib plots."""
+        for i, symbol in enumerate(self.symbols):
+            # Price plot
+            ax_price = self.axes[i, 0]
+            ax_price.set_title(f'{symbol} - Real-Time Price')
+            ax_price.set_ylabel('Price ($)')
+            ax_price.grid(True, alpha=0.3)
+            
+            line_price, = ax_price.plot([], [], 'b-', linewidth=2, label='Price')
+            self.lines[f'{symbol}_price'] = line_price
+            ax_price.legend()
+            
+            # Spread plot
+            ax_spread = self.axes[i, 1]
+            ax_spread.set_title(f'{symbol} - Real-Time Spread')
+            ax_spread.set_ylabel('Spread (bps)')
+            ax_spread.set_xlabel('Time')
+            ax_spread.grid(True, alpha=0.3)
+            
+            line_spread, = ax_spread.plot([], [], 'r-', linewidth=2, label='Spread')
+            self.lines[f'{symbol}_spread'] = line_spread
+            ax_spread.legend()
+        
+        plt.tight_layout()
+    
+    def update_data(self, spread_data):
+        """Update data from spread monitor callback."""
+        symbol = spread_data['symbol']
+        
+        if symbol in self.data_history:
+            # Add new data point
+            self.data_history[symbol]['timestamps'].append(spread_data['timestamp'])
+            self.data_history[symbol]['prices'].append(spread_data['price'])
+            self.data_history[symbol]['spreads'].append(spread_data['spread_bps'])
+            self.data_history[symbol]['volumes'].append(spread_data['volume'])
+            
+            print(f"{symbol}: Price=${spread_data['price']:.2f}, "
+                  f"Spread={spread_data['spread_bps']:.2f}bps, "
+                  f"Time={spread_data['timestamp'].strftime('%H:%M:%S')}")
+            
+            # Force plot update by refreshing the figure
+            if hasattr(self, 'fig'):
+                self.fig.canvas.draw_idle()
+    
+    def animate(self, frame):
+        """Animation function for matplotlib."""
+        for i, symbol in enumerate(self.symbols):
+            history = self.data_history[symbol]
+            
+            if len(history['timestamps']) > 0:
+                # Convert timestamps to matplotlib date numbers for proper time axis
+                import matplotlib.dates as mdates
+                time_nums = [mdates.date2num(t) for t in history['timestamps']]
+                
+                # Update price plot
+                self.lines[f'{symbol}_price'].set_data(time_nums, list(history['prices']))
+                ax_price = self.axes[i, 0]
+                if len(time_nums) >= 2:  # Need at least 2 points
+                    time_range = max(time_nums) - min(time_nums)
+                    if time_range > 0.000012:  # At least 1 second in matplotlib datenum units
+                        ax_price.set_xlim(min(time_nums) - time_range*0.05, max(time_nums) + time_range*0.05)
+                        # Format time axis
+                        ax_price.xaxis.set_major_formatter(mdates.DateFormatter('%H:%M:%S'))
+                        ax_price.figure.autofmt_xdate()
+                    
+                    price_range = max(history['prices']) - min(history['prices'])
+                    if price_range > 0:
+                        ax_price.set_ylim(min(history['prices']) - price_range*0.01, max(history['prices']) + price_range*0.01)
+                    else:
+                        # If prices are the same, add small buffer
+                        price_val = history['prices'][0]
+                        buffer = max(price_val * 0.0001, 0.01)  # Minimum buffer
+                        ax_price.set_ylim(price_val - buffer, price_val + buffer)
+                
+                # Update spread plot
+                self.lines[f'{symbol}_spread'].set_data(time_nums, list(history['spreads']))
+                ax_spread = self.axes[i, 1]
+                if len(time_nums) >= 2:
+                    time_range = max(time_nums) - min(time_nums)
+                    if time_range > 0.000012:  # At least 1 second in matplotlib datenum units
+                        ax_spread.set_xlim(min(time_nums) - time_range*0.05, max(time_nums) + time_range*0.05)
+                        # Format time axis
+                        ax_spread.xaxis.set_major_formatter(mdates.DateFormatter('%H:%M:%S'))
+                        ax_spread.figure.autofmt_xdate()
+                    
+                    if len(history['spreads']) > 0:
+                        spread_max = max(history['spreads'])
+                        spread_min = min(history['spreads'])
+                        if spread_max > spread_min:
+                            ax_spread.set_ylim(spread_min * 0.9, spread_max * 1.1)
+                        else:
+                            # If all spreads are the same
+                            buffer = max(spread_max * 0.1, 0.1)
+                            ax_spread.set_ylim(max(0, spread_max - buffer), spread_max + buffer)
+        
+        return list(self.lines.values())
+    
+    def start_monitoring(self, use_websocket: bool = True, interval: str = "1m"):
+        """
+        Start real-time monitoring.
+        
+        Parameters
+        ----------
+        use_websocket : bool
+            If True, use websocket data. If False, simulate with synthetic data.
+        interval : str
+            Data interval for websocket streams
+        """
+        print(f"Starting animated spread monitor for {self.symbols}")
+        print(f"WebSocket mode: {use_websocket}")
+        
+        if use_websocket:
+            try:
+                # Start real websocket monitoring
+                self.monitor.start_monitoring(interval)
+                print("WebSocket connection established")
+            except Exception as e:
+                print(f"WebSocket failed ({e}), falling back to simulation mode")
+                use_websocket = False
+        
+        if not use_websocket:
+            # Fallback to simulation mode
+            self.start_simulation_mode()
+        
+        # Start animation with more frequent updates
+        self.animation = animation.FuncAnimation(
+            self.fig, self.animate, interval=500, blit=False, cache_frame_data=False
+        )
+        
+        plt.show()
+    
+    def start_simulation_mode(self):
+        """Start simulation mode with synthetic data."""
+        import threading
+        import time
+        from data.fetch import generate_synthetic_crypto_data
+        
+        def simulation_loop():
+            print("Starting simulation mode...")
+            while True:
+                try:
+                    # Generate new data point
+                    df = generate_synthetic_crypto_data(
+                        symbols=self.symbols,
+                        hours=1,  # Generate 1 hour of data
+                        interval_minutes=1  # 1-minute intervals
+                    )
+                    
+                    # Process latest data for each symbol
+                    for symbol in self.symbols:
+                        symbol_data = df[df['symbol'] == symbol].iloc[-1]
+                        
+                        # Calculate a simple spread estimate
+                        spread_pct = (symbol_data['high'] - symbol_data['low']) / symbol_data['close']
+                        
+                        spread_data = {
+                            'symbol': symbol,
+                            'timestamp': datetime.now(),
+                            'spread': spread_pct,
+                            'spread_bps': spread_pct * 10000,
+                            'price': symbol_data['close'],
+                            'volume': symbol_data['volume']
+                        }
+                        
+                        self.update_data(spread_data)
+                    
+                    time.sleep(2)  # Update every 2 seconds
+                    
+                except KeyboardInterrupt:
+                    break
+                except Exception as e:
+                    print(f"Simulation error: {e}")
+                    time.sleep(5)
+        
+        # Start simulation in separate thread
+        sim_thread = threading.Thread(target=simulation_loop)
+        sim_thread.daemon = True
+        sim_thread.start()
+    
+    def stop_monitoring(self):
+        """Stop monitoring and close plots."""
+        if hasattr(self, 'monitor'):
+            self.monitor.stop_monitoring()
+        if self.animation:
+            self.animation.event_source.stop()
+        plt.close(self.fig)
+
+def create_dashboard_example():
+    """
+    Create a comprehensive real-time dashboard example.
+    """
+    print("Real-Time Crypto Spread Dashboard")
+    print("=" * 40)
+    
+    # Popular crypto symbols
+    symbols = ["BTCUSDT", "ETHUSDT", "ADAUSDT"]
+    
+    try:
+        # Create animated monitor
+        monitor = AnimatedSpreadMonitor(symbols, max_points=50)
+        
+        print(f"\\nMonitoring symbols: {', '.join(symbols)}")
+        print("Press Ctrl+C to stop monitoring")
+        print("Close the plot window to exit")
+        
+        # Start monitoring (will try websocket first, fall back to simulation)
+        monitor.start_monitoring(use_websocket=True, interval="1m")
+        
+    except KeyboardInterrupt:
+        print("\\nStopping monitor...")
+        if 'monitor' in locals():
+            monitor.stop_monitoring()
+    except Exception as e:
+        print(f"Error: {e}")
+
+def simple_console_monitor():
+    """
+    Simple console-based real-time monitor without animation.
+    """
+    print("Simple Console Spread Monitor")
+    print("=" * 30)
+    
+    symbols = ["BTCUSDT", "ETHUSDT"]
+    
+    def print_spread_update(spread_data):
+        """Print spread updates to console."""
+        print(f"[{spread_data['timestamp'].strftime('%H:%M:%S')}] "
+              f"{spread_data['symbol']}: "
+              f"${spread_data['price']:.2f} | "
+              f"Spread: {spread_data['spread_bps']:.2f}bps")
+    
+    try:
+        # Create spread monitor
+        monitor = create_spread_monitor(symbols, window=10)
+        monitor.add_spread_callback(print_spread_update)
+        
+        print(f"\\nStarting console monitoring for {', '.join(symbols)}")
+        print("Press Ctrl+C to stop\\n")
+        
+        # Try websocket first
+        try:
+            monitor.start_monitoring("1m")
+            
+            # Keep running
+            while monitor.running:
+                time.sleep(1)
+                
+        except Exception as e:
+            print(f"WebSocket error: {e}")
+            print("Falling back to simulation...")
+            
+            # Simulation fallback
+            from data.fetch import generate_synthetic_crypto_data
+            while True:
+                df = generate_synthetic_crypto_data(symbols, hours=1, interval_minutes=1)
+                for symbol in symbols:
+                    symbol_data = df[df['symbol'] == symbol].iloc[-1]
+                    spread_pct = (symbol_data['high'] - symbol_data['low']) / symbol_data['close']
+                    
+                    spread_data = {
+                        'symbol': symbol,
+                        'timestamp': datetime.now(),
+                        'spread_bps': spread_pct * 10000,
+                        'price': symbol_data['close']
+                    }
+                    print_spread_update(spread_data)
+                
+                time.sleep(3)
+        
+    except KeyboardInterrupt:
+        print("\\nStopping monitor...")
+        if 'monitor' in locals():
+            monitor.stop_monitoring()
+
+if __name__ == "__main__":
+    import argparse
+    
+    parser = argparse.ArgumentParser(description="Real-Time Spread Monitor")
+    parser.add_argument("--mode", choices=["dashboard", "console"], default="dashboard",
+                       help="Monitor mode: dashboard (animated) or console (text)")
+    parser.add_argument("--symbols", nargs="+", default=["BTCUSDT", "ETHUSDT"],
+                       help="Symbols to monitor")
+    
+    args = parser.parse_args()
+    
+    if args.mode == "dashboard":
+        # Check if display is available for GUI
+        try:
+            import matplotlib
+            matplotlib.use('TkAgg')  # Try GUI backend
+            create_dashboard_example()
+        except:
+            print("GUI not available, switching to console mode")
+            simple_console_monitor()
+    else:
+        simple_console_monitor()

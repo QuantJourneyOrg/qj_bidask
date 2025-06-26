@@ -8,7 +8,11 @@ Demonstrates real-time monitoring of bid-ask spreads with threshold alerts.
 import pandas as pd
 import matplotlib.pyplot as plt
 import numpy as np
+
 from quantjourney_bidask import edge_rolling, fetch_yfinance_data
+
+
+
 
 def spread_monitor(df, window=24, low_percentile=25, high_percentile=75):
     """

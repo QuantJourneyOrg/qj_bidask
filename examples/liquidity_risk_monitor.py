@@ -1,6 +1,7 @@
 import pandas as pd
 import matplotlib.pyplot as plt
-from quantjourney_bidask import fetch_binance_data, edge_rolling
+from quantjourney_bidask import edge_rolling
+from data.fetch import fetch_binance_data
 
 def liquidity_risk_monitor(df, window=24, spread_zscore_threshold=2):
     """

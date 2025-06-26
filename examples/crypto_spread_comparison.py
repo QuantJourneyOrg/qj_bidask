@@ -10,8 +10,10 @@ import pandas as pd
 import matplotlib.pyplot as plt
 import numpy as np
 import sys
-sys.path.insert(0, '..')
-from quantjourney_bidask import edge_rolling, fetch_yfinance_data
+sys.path.insert(0, './data')
+from quantjourney_bidask import edge_rolling
+from data.fetch import fetch_yfinance_data, generate_synthetic_crypto_data
+
 
 def create_synthetic_crypto_data():
     """

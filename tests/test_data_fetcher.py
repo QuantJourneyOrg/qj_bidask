@@ -1,6 +1,6 @@
 import pytest
 import pandas as pd
-from quantjourney_bidask import fetch_binance_data, fetch_yfinance_data
+from data.fetch import fetch_binance_data, fetch_yfinance_data
 from unittest.mock import patch, Mock
 
 @patch('requests.post')

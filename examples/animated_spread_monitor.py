@@ -10,8 +10,10 @@ import matplotlib.pyplot as plt
 import matplotlib.animation as animation
 import numpy as np
 import sys
-sys.path.insert(0, '..')
-from quantjourney_bidask import edge_rolling, fetch_yfinance_data
+sys.path.insert(0, './data')
+from quantjourney_bidask import edge_rolling
+from fetch import fetch_yfinance_data, generate_synthetic_crypto_data
+
 
 def create_animated_spread_plot(df, window=20, save_gif=True):
     """
