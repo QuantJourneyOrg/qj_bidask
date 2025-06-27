@@ -240,3 +240,6 @@ data_full/
 # Sandbox testing (not for version control)
 sandbox/
 PYPI_UPLOAD_GUIDE.md
+
+venv/
+.venv/
