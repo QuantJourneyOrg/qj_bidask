@@ -12,7 +12,7 @@ import numpy as np
 import sys
 sys.path.insert(0, './data')
 from quantjourney_bidask import edge_rolling
-from data.fetch import fetch_yfinance_data, generate_synthetic_crypto_data
+from data.fetch import DataFetcher, get_crypto_data
 
 
 def create_synthetic_crypto_data():

@@ -77,15 +77,42 @@ print(f"Rolling spreads: {rolling_spreads}")
 ### Data Fetching Integration
 
 ```python
-from data.fetch import fetch_yfinance_data
+from data.fetch import get_stock_data, get_crypto_data
 from quantjourney_bidask import edge_rolling
+import asyncio
 
-# Fetch OHLC data for a stock
-df = fetch_yfinance_data(["AAPL"], period="1mo", interval="1d")
+# Fetch stock data
+stock_df = get_stock_data("AAPL", period="1mo", interval="1d")
+stock_spreads = edge_rolling(stock_df, window=20)
+print(f"AAPL average spread: {stock_spreads.mean():.6f}")
 
-# Calculate rolling spread from fetched data
-spreads = edge_rolling(df, window=20)
-print(f"AAPL average spread: {spreads.mean():.6f}")
+# Fetch crypto data (async)
+async def get_crypto_spreads():
+    crypto_df = await get_crypto_data("BTC/USDT", "binance", "1h", 168)
+    crypto_spreads = edge_rolling(crypto_df, window=24)
+    return crypto_spreads.mean()
+
+crypto_avg_spread = asyncio.run(get_crypto_spreads())
+print(f"BTC average spread: {crypto_avg_spread:.6f}")
+```
+
+### Real-time Data Streaming
+
+```python
+from data.fetch import DataFetcher
+import asyncio
+
+async def stream_btc_spreads():
+    fetcher = DataFetcher()
+    # Stream BTC data for 60 seconds
+    btc_stream = await fetcher.get_btc_1m_websocket(duration_seconds=60)
+    
+    # Calculate spread from real-time data
+    if not btc_stream.empty:
+        avg_spread_pct = (btc_stream['spread'] / btc_stream['price']).mean() * 100
+        print(f"Real-time BTC average spread: {avg_spread_pct:.4f}%")
+
+asyncio.run(stream_btc_spreads())
 ```
 
 ### Real-Time Spread Monitoring
@@ -116,23 +143,125 @@ python examples/realtime_spread_monitor.py --mode dashboard
 python examples/realtime_spread_monitor.py --mode console
 ```
 
-## Examples
+## Project Structure
 
-The `examples/` directory contains comprehensive examples:
+```
+quantjourney_bidask/
+├── quantjourney_bidask/          # Main library code
+│   ├── __init__.py
+│   ├── edge.py                   # Core EDGE estimator
+│   ├── edge_rolling.py           # Rolling window estimation
+│   └── edge_expanding.py         # Expanding window estimation
+├── data/
+│   └── fetch.py                  # Simplified data fetcher for examples
+├── examples/                     # Comprehensive usage examples
+│   ├── simple_data_example.py    # Basic usage demonstration
+│   ├── spread_estimator.py       # Spread estimation examples
+│   ├── animated_spread_monitor.py # Animated visualizations
+│   ├── crypto_spread_comparison.py # Crypto spread analysis
+│   ├── liquidity_risk_monitor.py  # Risk monitoring
+│   ├── realtime_spread_monitor.py # Live monitoring dashboard
+│   └── stock_liquidity_risk.py    # Stock liquidity analysis
+├── tests/                        # Unit tests (GitHub only)
+│   ├── test_edge.py
+│   ├── test_edge_rolling.py
+│   └── test_data_fetcher.py
+└── _output/                      # Example output images
+    ├── simple_data_example.png
+    ├── crypto_spread_comparison.png
+    └── spread_estimator_results.png
+```
 
-- `spread_estimator.py` - Basic spread estimation examples
-- `spread_monitor.py` - Spread monitoring with threshold alerts
-- `realtime_spread_monitor.py` - Live websocket monitoring with animation
-- `crypto_spread_comparison.py` - Multi-asset spread comparison
-- `liquidity_risk_monitor.py` - Liquidity risk monitoring
-- `stock_liquidity_risk.py` - Stock-specific liquidity analysis
+## Examples and Visualizations
 
-Run any example:
+The package includes comprehensive examples with beautiful visualizations:
+
+### Basic Data Analysis
+![Crypto Spread Analysis](_output/crypto_spread_comprehensive_analysis.png)
+
+### Crypto Spread Comparison  
+![Crypto Spread Comparison](_output/crypto_spread_comparison.png)
+
+### Spread Estimation Results
+![Spread Estimator Results](_output/spread_estimator_results.png)
+
+### Running Examples
+
+After installing via pip, examples are included in the package:
+
+```python
+import quantjourney_bidask
+from pathlib import Path
+
+# Find package location
+pkg_path = Path(quantjourney_bidask.__file__).parent
+examples_path = pkg_path.parent / 'examples'
+print(f"Examples located at: {examples_path}")
+
+# List available examples
+for example in examples_path.glob('*.py'):
+    print(f"📄 {example.name}")
+```
+
+Or clone the repository for full access to examples and tests:
 
 ```bash
+git clone https://github.com/QuantJourneyOrg/qj_bidask
+cd qj_bidask
+python examples/simple_data_example.py
 python examples/spread_estimator.py
-python examples/realtime_spread_monitor.py
+python examples/crypto_spread_comparison.py
 ```
+
+### Available Examples
+
+- **`simple_data_example.py`** - Basic usage with stock and crypto data
+- **`spread_estimator.py`** - Core spread estimation functionality
+- **`animated_spread_monitor.py`** - Real-time animated visualizations
+- **`crypto_spread_comparison.py`** - Multi-asset crypto analysis
+- **`liquidity_risk_monitor.py`** - Risk monitoring and alerts
+- **`realtime_spread_monitor.py`** - Live websocket monitoring dashboard
+- **`stock_liquidity_risk.py`** - Stock-specific liquidity analysis
+
+## Testing and Development
+
+### Unit Tests
+The package includes comprehensive unit tests (available in the GitHub repository):
+
+- **`test_edge.py`** - Core EDGE estimator tests with known values from the academic paper
+- **`test_edge_rolling.py`** - Rolling window estimation tests
+- **`test_edge_expanding.py`** - Expanding window estimation tests  
+- **`test_data_fetcher.py`** - Data fetching functionality tests
+- **`test_estimators.py`** - Integration tests for all estimators
+
+Tests verify accuracy against the original paper's test cases and handle edge cases like missing data, non-positive prices, and various market conditions.
+
+### Development and Testing
+For full development access including tests:
+
+```bash
+# Clone the repository
+git clone https://github.com/QuantJourneyOrg/qj_bidask
+cd qj_bidask
+
+# Install in development mode
+pip install -e .
+
+# Run tests
+python -m pytest tests/ -v
+
+# Run specific test files
+python -m pytest tests/test_edge.py -v
+python -m pytest tests/test_data_fetcher.py -v
+
+# Run examples
+python examples/simple_data_example.py
+python examples/spread_estimator.py
+```
+
+### Package vs Repository
+- **PyPI Package** (`pip install quantjourney-bidask`): Includes core library, examples, and documentation
+- **GitHub Repository**: Full development environment with tests, development tools, and additional documentation
 
 ## API Reference
 
@@ -144,11 +273,13 @@ python examples/realtime_spread_monitor.py
 
 ### Data Fetching (`data/fetch.py`)
 
-- `fetch_yfinance_data(tickers, period, interval)`: Fetch real market data from Yahoo Finance
-- `generate_synthetic_crypto_data(symbols, hours, interval_minutes)`: Generate synthetic crypto data
-- `fetch_binance_data(*args, **kwargs)`: Compatibility function (returns synthetic data)
-- `create_realtime_stream(symbols, exchange)`: Create websocket data stream
-- `create_spread_monitor(symbols, window)`: Create real-time spread monitor
+- `DataFetcher()`: Main data fetcher class
+- `get_stock_data(ticker, period, interval)`: Fetch stock data from Yahoo Finance
+- `get_crypto_data(symbol, exchange, timeframe, limit)`: Fetch crypto data via CCXT (async)
+- `stream_btc_data(duration_seconds)`: Stream BTC data via websocket (async)
+- `DataFetcher.get_btc_1m_websocket()`: Stream BTC 1-minute data
+- `DataFetcher.get_historical_crypto_data()`: Get historical crypto OHLCV data
+- `DataFetcher.save_data()` / `DataFetcher.load_data()`: Save/load data to CSV
 
 ### Real-Time Classes
 

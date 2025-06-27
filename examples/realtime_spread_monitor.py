@@ -27,7 +27,7 @@ if project_root not in sys.path:
 logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
 logger = logging.getLogger(__name__)
 
-from data.fetch import QuantDataFetcher
+from data.fetch import DataFetcher, stream_btc_data
 
 try:
     from quantjourney_bidask import edge_rolling

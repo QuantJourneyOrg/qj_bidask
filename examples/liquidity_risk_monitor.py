@@ -1,7 +1,7 @@
 import pandas as pd
 import matplotlib.pyplot as plt
 from quantjourney_bidask import edge_rolling
-from data.fetch import fetch_binance_data
+from data.fetch import DataFetcher, get_crypto_data
 
 def liquidity_risk_monitor(df, window=24, spread_zscore_threshold=2):
     """
@@ -27,14 +27,13 @@ def liquidity_risk_monitor(df, window=24, spread_zscore_threshold=2):
     df['risk_flag'] = df['spread_zscore'] > spread_zscore_threshold
     return df
 
-# Fetch Binance data
-binance_df = fetch_binance_data(
-    symbols=["BTCUSDT"],
-    timeframe="1h",
-    start="2024-01-01T00:00:00Z",
-    end="2024-01-07T00:00:00Z",
-    api_key="your-api-key"
-)
+# Fetch crypto data - using async function in sync way for example
+import asyncio
+
+async def fetch_data():
+    return await get_crypto_data("BTC/USDT", "binance", "1h", 168)  # 1 week of hourly data
+
+binance_df = asyncio.run(fetch_data())
 
 # Apply liquidity risk monitor
 btc_df = liquidity_risk_monitor(binance_df, window=24, spread_zscore_threshold=2)

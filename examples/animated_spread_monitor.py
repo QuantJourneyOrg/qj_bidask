@@ -10,9 +10,13 @@ import matplotlib.pyplot as plt
 import matplotlib.animation as animation
 import numpy as np
 import sys
-sys.path.insert(0, './data')
+import os
+
+# Add parent directory to path
+sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+
 from quantjourney_bidask import edge_rolling
-from fetch import fetch_yfinance_data, generate_synthetic_crypto_data
+from data.fetch import DataFetcher, get_stock_data
 
 
 def create_animated_spread_plot(df, window=20, save_gif=True):
@@ -260,11 +264,7 @@ if __name__ == "__main__":
     # Example 3: Real data (if available)
     print("\n3. Testing with real market data...")
     try:
-        real_df = fetch_yfinance_data(
-            tickers=["SPY"],
-            period="5d",
-            interval="1h"
-        )
+        real_df = get_stock_data("SPY", period="5d", interval="1h")
         
         real_df['spread'] = edge_rolling(real_df, window=12)  # 12-hour window
         

@@ -3,7 +3,17 @@ include README.md
 include pyproject.toml
 include CHANGELOG.md
 include requirements.txt
+
+# Documentation and examples for users
 include docs/usage_examples.ipynb
 include examples/*.py
-include tests/*.py
+include data/*.py
+
+# Main package code
 recursive-include quantjourney_bidask *.py
+
+# Exclude development-only files
+exclude tests/*.py
+exclude *.egg-info/*
+exclude build/*
+exclude dist/*

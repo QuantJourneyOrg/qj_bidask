@@ -1,7 +1,7 @@
 """Version information for quantjourney_bidask."""
 
-__version__ = "0.1.0"
+__version__ = "0.9.1"
 __author__ = "Jakub Polec"
 __email__ = "jakub@quantjourney.pro"
-__license__ = "Apache License 2.0"
-__copyright__ = "Copyright (c) 2024 Jakub Polec, QuantJourney"
+__license__ = "MIT"
+__copyright__ = "Copyright (c) 2025 Jakub Polec, QuantJourney"

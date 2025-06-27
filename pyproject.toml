@@ -5,8 +5,9 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "quantjourney-bidask"
-version = "0.5.0"
+version = "0.9.1"
 license = "MIT"
+
 authors = [
   { name = "Jakub Polec", email = "jakub@quantjourney.pro" },
 ]

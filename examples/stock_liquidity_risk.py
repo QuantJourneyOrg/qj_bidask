@@ -1,18 +1,15 @@
 
 import sys
-sys.path.insert(0, './data')
+import os
+sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 from quantjourney_bidask import edge_rolling
-from fetch import fetch_yfinance_data
+from data.fetch import get_stock_data
 
 
 
 
 # Fetch Yahoo Finance data
-yf_df = fetch_yfinance_data(
-    tickers=["AAPL"],
-    period="3mo",
-    interval="1d"
-)
+yf_df = get_stock_data("AAPL", period="3mo", interval="1d")
 
 # Apply liquidity risk monitor
 aapl_df = liquidity_risk_monitor(yf_df, window=20, spread_zscore_threshold=1.5)

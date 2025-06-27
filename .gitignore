@@ -204,12 +204,17 @@ playground/
 docs/build/
 docs/_build/
 
-# Example outputs
+# Example outputs (keep _output/ for README images)
 examples/output/
 examples/plots/
 examples/*.png
 examples/*.jpg
 examples/*.pdf
+
+# Keep example output images for README
+!_output/
+!_output/*.png
+!_output/*.jpg
 
 # Data files (if any)
 data/
@@ -227,3 +232,11 @@ data/
 
 # Jupyter notebook outputs
 *.ipynb_checkpoints/ 
+
+# Archive
+@archive/
+data_full/
+
+# Sandbox testing (not for version control)
+sandbox/
+PYPI_UPLOAD_GUIDE.md

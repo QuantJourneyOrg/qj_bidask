@@ -16,7 +16,7 @@ import os
 sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
 from quantjourney_bidask import edge, edge_rolling, edge_expanding
-from data.fetch import fetch_yfinance_data
+from data.fetch import DataFetcher, get_stock_data
 
 print("Spread Estimator Examples")
 print("========================")
