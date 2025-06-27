@@ -41,9 +41,15 @@ def edge_expanding(
     Examples
     --------
     >>> import pandas as pd
-    >>> df = pd.read_csv("https://raw.githubusercontent.com/eguidotti/bidask/main/pseudocode/ohlc.csv")
-    >>> spreads = edge_expanding(df, min_periods=21)
-    >>> print(spreads.head())
+    >>> # Example OHLC DataFrame
+    >>> df = pd.DataFrame({
+    ...     'open': [100.0, 101.5, 99.8, 102.1, 100.9, 103.2],
+    ...     'high': [102.3, 103.0, 101.2, 103.5, 102.0, 104.8],
+    ...     'low': [99.5, 100.8, 98.9, 101.0, 100.1, 102.5],
+    ...     'close': [101.2, 102.5, 100.3, 102.8, 101.5, 104.1]
+    ... })
+    >>> spreads = edge_expanding(df, min_periods=3)
+    >>> print(spreads.dropna())
     """
     # Standardize column names
     df = df.rename(columns=str.lower).copy()

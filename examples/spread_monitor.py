@@ -9,7 +9,8 @@ import pandas as pd
 import matplotlib.pyplot as plt
 import numpy as np
 
-from quantjourney_bidask import edge_rolling, fetch_yfinance_data
+from quantjourney_bidask import edge_rolling
+from data.fetch import get_stock_data
 
 
 
@@ -165,8 +166,8 @@ if len(high_spread_periods) > 0:
 print("\n5. Real data example...")
 try:
     # Fetch real data
-    real_df = fetch_yfinance_data(
-        tickers=["QQQ"],  # NASDAQ ETF
+    real_df = get_stock_data(
+        ticker="QQQ",  # NASDAQ ETF
         period="2mo", 
         interval="1h"
     )

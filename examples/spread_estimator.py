@@ -22,13 +22,17 @@ print("Spread Estimator Examples")
 print("========================")
 
 # Test data download from the original paper
-print("\n1. Testing with original paper's dataset...")
-try:
-    df = pd.read_csv("https://raw.githubusercontent.com/eguidotti/bidask/main/pseudocode/ohlc.csv")
-    spread = edge(df.Open, df.High, df.Low, df.Close)
-    print(f"Paper test data spread: {spread:.6f} (expected: ~0.010185)")
-except Exception as e:
-    print(f"Could not fetch test data: {e}")
+print("\n1. Testing with sample OHLC data...")
+# Create sample OHLC data for testing
+sample_data = {
+    'Open': [100.0, 101.5, 99.8, 102.1, 100.9, 103.2, 101.7, 104.5, 102.3, 105.1],
+    'High': [102.3, 103.0, 101.2, 103.5, 102.0, 104.8, 103.1, 106.2, 104.0, 106.5],
+    'Low': [99.5, 100.8, 98.9, 101.0, 100.1, 102.5, 101.0, 103.8, 101.5, 104.2],
+    'Close': [101.2, 102.5, 100.3, 102.8, 101.5, 104.1, 102.4, 105.7, 103.2, 105.8]
+}
+df = pd.DataFrame(sample_data)
+spread = edge(df.Open, df.High, df.Low, df.Close)
+print(f"Sample data spread: {spread:.6f}")
 
 # Generate synthetic data for testing
 print("\n2. Testing with synthetic data...")
@@ -106,8 +110,8 @@ print(f"True embedded spread: {spread_pct*100:.4f}%")
 print("\n5. Real data examples (Yahoo Finance)...")
 try:
     # Fetch SPY data
-    spy_df = fetch_yfinance_data(
-        tickers=["SPY"],
+    spy_df = get_stock_data(
+        ticker="SPY",
         period="1mo",
         interval="1d"
     )

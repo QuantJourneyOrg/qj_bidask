@@ -47,10 +47,14 @@ def edge(
     Examples
     --------
     >>> import pandas as pd
-    >>> df = pd.read_csv("https://raw.githubusercontent.com/eguidotti/bidask/main/pseudocode/ohlc.csv")
-    >>> spread = edge(df.Open, df.High, df.Low, df.Close)
+    >>> # Example OHLC data
+    >>> open_prices = [100.0, 101.5, 99.8, 102.1, 100.9]
+    >>> high_prices = [102.3, 103.0, 101.2, 103.5, 102.0]
+    >>> low_prices = [99.5, 100.8, 98.9, 101.0, 100.1]
+    >>> close_prices = [101.2, 102.5, 100.3, 102.8, 101.5]
+    >>> spread = edge(open_prices, high_prices, low_prices, close_prices)
     >>> print(f"Estimated spread: {spread:.6f}")
-    Estimated spread: 0.010185
+    Estimated spread: 0.007109
     """
     # Convert inputs to numpy arrays
     open = np.asarray(open, dtype=float)

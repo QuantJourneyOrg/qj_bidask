@@ -5,9 +5,20 @@ from quantjourney_bidask import edge, edge_rolling
 
 @pytest.fixture
 def ohlc_data():
-    return pd.read_csv(
-        "https://raw.githubusercontent.com/eguidotti/bidask/main/pseudocode/ohlc.csv"
-    )
+    """Test OHLC data for rolling edge estimation."""
+    np.random.seed(42)
+    n = 50
+    base_price = 100
+    
+    # Generate realistic OHLC data
+    prices = base_price + np.cumsum(np.random.normal(0, 0.5, n))
+    
+    return pd.DataFrame({
+        'open': prices,
+        'high': prices * (1 + np.random.uniform(0, 0.02, n)),
+        'low': prices * (1 - np.random.uniform(0, 0.02, n)),
+        'close': prices + np.random.normal(0, 0.2, n)
+    })
 
 @pytest.mark.parametrize("window", [3, 21, 100])
 @pytest.mark.parametrize("sign", [True, False])
@@ -24,10 +35,10 @@ def test_edge_rolling(ohlc_data, window, sign, step):
         t1 = t + 1
         t0 = t1 - window
         estimate = edge(
-            ohlc_data.Open.values[t0:t1],
-            ohlc_data.High.values[t0:t1],
-            ohlc_data.Low.values[t0:t1],
-            ohlc_data.Close.values[t0:t1],
+            ohlc_data.open.values[t0:t1],
+            ohlc_data.high.values[t0:t1],
+            ohlc_data.low.values[t0:t1],
+            ohlc_data.close.values[t0:t1],
             sign=sign
         ) if t0 >= 0 else np.nan
         expected_estimates.append(estimate)

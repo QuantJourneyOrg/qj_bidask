@@ -177,13 +177,13 @@ quantjourney_bidask/
 The package includes comprehensive examples with beautiful visualizations:
 
 ### Basic Data Analysis
-![Crypto Spread Analysis](_output/crypto_spread_comprehensive_analysis.png)
+![Crypto Spread Analysis](https://raw.githubusercontent.com/QuantJourneyOrg/qj_bidask/ad49bd78c82ab1c44561d0f2e707ae304575a147/_output/crypto_spread_comprehensive_analysis.png)
 
 ### Crypto Spread Comparison  
-![Crypto Spread Comparison](_output/crypto_spread_comparison.png)
+![Crypto Spread Comparison](https://raw.githubusercontent.com/QuantJourneyOrg/qj_bidask/refs/heads/main/_output/crypto_spread_comparison.png)
 
 ### Spread Estimation Results
-![Spread Estimator Results](_output/spread_estimator_results.png)
+![Spread Estimator Results](https://raw.githubusercontent.com/QuantJourneyOrg/qj_bidask/refs/heads/main/_output/spread_estimator_results.png)
 
 ### Running Examples
 
@@ -309,22 +309,6 @@ Real-time features:
 - Animated visualizations
 - Threshold alerts
 - Multi-symbol monitoring
-
-## Academic Citation
-
-If you use this library in academic research, please cite:
-
-```bibtex
-@article{ardia2024efficient,
-  title={Efficient Estimation of Bid-Ask Spreads from Open, High, Low, and Close Prices},
-  author={Ardia, David and Guidotti, Emanuele and Kroencke, Tim A},
-  journal={Journal of Financial Economics},
-  volume={161},
-  pages={103916},
-  year={2024},
-  publisher={Elsevier}
-}
-```
 
 ## License
 
