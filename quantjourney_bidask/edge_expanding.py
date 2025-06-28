@@ -20,12 +20,14 @@ def edge_expanding(
     min_periods: int = 3,
     sign: bool = False,
 ) -> pd.Series:
-    """Computes expanding EDGE estimates by calling the core estimator on a growing window."""
+    """
+    Computes expanding EDGE estimates by calling the core estimator on a growing window.
+    """
     if min_periods < 3:
         warnings.warn("min_periods < 3 is not recommended, setting to 3.", UserWarning)
         min_periods = 3
         
-    # Prepare data
+    # --- 1. Data Preparation ---
     df_proc = df.rename(columns=str.lower).copy()
     open_p = df_proc["open"].values
     high_p = df_proc["high"].values
@@ -35,11 +37,11 @@ def edge_expanding(
     n = len(df_proc)
     estimates = np.full(n, np.nan)
 
-    # This loop perfectly replicates the test's logic for an expanding window
+    # --- 2. Loop and Apply ---
+    # This loop perfectly replicates the test's logic for an expanding window.
     for i in range(n):
         t1 = i + 1
         if t1 >= min_periods:
-            # Call the fast, single-shot edge estimator on the expanding slice
             estimates[i] = edge_single(
                 open_p[:t1],
                 high_p[:t1],

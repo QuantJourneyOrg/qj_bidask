@@ -42,46 +42,45 @@ The package includes comprehensive examples with beautiful visualizations:
 
 ## FAQ
 
-### What exactly does the estimator compute?
-The estimator returns the root mean square effective spread over the sample period. This quantifies the average transaction cost implied by bid-ask spreads, based on open, high, low, and close (OHLC) prices.
+ ### What exactly does the estimator compute?
+ The estimator returns the root mean square effective spread over the sample period. This quantifies the average transaction cost implied by bid-ask spreads, based on open, high, low, and close (OHLC) prices.
 
-### What is unique about this implementation?
-This package includes a heavily optimized and enhanced implementation of the estimator proposed by Ardia, Guidotti, and Kroencke (2024). It features:
+ ### What is unique about this implementation?
+ This package provides a highly optimized and robust implementation of the EDGE estimator. Beyond a direct translation of the paper's formula, it features:
 
-- Robust numerical handling of non-positive or missing prices
-- Floating-point-safe comparisons using configurable epsilon
-- Vectorized log-return computations for faster evaluation
-- Improved error detection and early exits for invalid OHLC structures
-- Efficient rolling and expanding spread estimators
+ - A Hybrid, High-Performance Engine: The core logic leverages fast, vectorized NumPy operations for data preparation and calls a specialized, JIT-compiled kernel via Numba for the computationally intensive GMM calculations.
+ - HFT-Ready Version (edge_hft.py): An included, hyper-optimized function that uses fastmath compilation for the absolute lowest latency, designed for production HFT pipelines where every microsecond matters.
+ - Robust Data Handling: Gracefully manages missing values (NaN) and non-positive prices to prevent crashes.
+ - Advanced Windowing Functions: Efficient and correct edge_rolling and edge_expanding functions that are fully compatible with the powerful features of pandas, including custom step sizes.
 
-These improvements make the estimator suitable for large-scale usage in backtesting, live monitoring, and production pipelines.
+ ### What's the difference between the edge functions?
+ The library provides a tiered set of functions for different needs:
 
-### What is the minimum number of observations?
-At least 3 valid observations are required.
+ - edge(): The core function. It's fast, robust, and computes a single spread estimate for a given sample of data. This is the building block for all other functions.
+ - edge_hft(): A specialized version of edge() for HFT users. It's the fastest possible implementation but requires perfectly clean input data (no NaNs) to achieve its speed.
+ - edge_rolling(): Computes the spread on a rolling window over a time series. It's perfect for seeing how the spread evolves over time. It is highly optimized and accepts all arguments from pandas.DataFrame.rolling() (like window and step).
+ - edge_expanding(): Computes the spread on an expanding (cumulative) window. This is useful for analyzing how the spread estimate converges or changes as more data becomes available.
 
-### How should I choose the window size or frequency?
-Short windows (e.g. a few days) reflect local spread conditions but may be noisy. Longer windows (e.g. 1 year) reduce variance but smooth over changes. For intraday use, minute-level frequency is recommended if the asset trades frequently.
+ ### What is the minimum number of observations?
+ At least 3 valid observations are required.
 
-**Rule of thumb**: ensure on average ≥2 trades per interval.
+ ### How should I choose the window size or frequency?
+ Short windows (e.g. a few days) reflect local spread conditions but may be noisy. Longer windows (e.g. 1 year) reduce variance but smooth over changes. For intraday use, minute-level frequency is recommended if the asset trades frequently.
 
-### Can I use intraday or tick data?
-Yes — the estimator supports intraday OHLC data directly. For tick data, resample into OHLC format first (e.g., using pandas resample).
+ Rule of thumb: ensure on average ≥2 trades per interval.
 
-### What if I get NaN results?
-The estimator may return NaN if:
+ ### Can I use intraday or tick data?
+ Yes — the estimator supports intraday OHLC data directly. For tick data, resample into OHLC format first (e.g., using pandas.resample).
 
-- Input prices are inconsistent (e.g. high < low)
-- There are too many missing or invalid values
-- Probability thresholds are not met (e.g. insufficient variance in prices)
-- Spread variance is non-positive
+ ### What if I get NaN results?
+ The estimator may return NaN if:
 
-In these cases, re-examine your input or adjust the sampling frequency.
+ - Input prices are inconsistent (e.g. high < low)
+ - There are too many missing or invalid values
+ - Probability thresholds are not met (e.g. insufficient variance in prices)
+ - Spread variance is non-positive
 
-### What's the difference between edge() and edge_rolling()?
-- `edge()` computes a point estimate over a static sample.
-- `edge_rolling()` computes rolling window estimates, optimized for speed.
-
-Both use the same core logic and yield identical results on valid, complete data.
+ In these cases, re-examine your input or adjust the sampling frequency.
 
 ## Installation
 
@@ -144,9 +143,9 @@ from quantjourney_bidask import edge_rolling
 import asyncio
 
 # Fetch stock data
-stock_df = get_stock_data("AAPL", period="1mo", interval="1d")
+stock_df = get_stock_data("PL", period="1mo", interval="1d")
 stock_spreads = edge_rolling(stock_df, window=20)
-print(f"AAPL average spread: {stock_spreads.mean():.6f}")
+print(f"PL average spread: {stock_spreads.mean():.6f}")
 
 # Fetch crypto data (async)
 async def get_crypto_spreads():
@@ -233,7 +232,7 @@ quantjourney_bidask/
 │   ├── test_edge_rolling.py
 │   └── test_edge_expanding.py
 │   └── test_data_fetcher.py
-│   └── testestimators.py
+│   └── test_estimators.py
 └── _output/                      # Example output images
     ├── simple_data_example.png
     ├── crypto_spread_comparison.png
