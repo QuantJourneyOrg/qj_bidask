@@ -214,7 +214,8 @@ python examples/animated_spread_monitor.py
 quantjourney_bidask/
 ├── quantjourney_bidask/          # Main library code
 │   ├── __init__.py
-│   ├── edge.py                   # Core EDGE estimator
+│   ├── edge.py                   # Core EDGE estimator 
+│   ├── edge_hft.py               # EDGE estimator optimised HFT-version
 │   ├── edge_rolling.py           # Rolling window estimation
 │   └── edge_expanding.py         # Expanding window estimation
 ├── data/
@@ -230,7 +231,9 @@ quantjourney_bidask/
 ├── tests/                        # Unit tests (GitHub only)
 │   ├── test_edge.py
 │   ├── test_edge_rolling.py
+│   └── test_edge_expanding.py
 │   └── test_data_fetcher.py
+│   └── testestimators.py
 └── _output/                      # Example output images
     ├── simple_data_example.png
     ├── crypto_spread_comparison.png
