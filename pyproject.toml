@@ -5,7 +5,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "quantjourney-bidask"
-version = "1.0"
+version = "1.0.2"
 license = {text = "MIT"}
 
 authors = [
@@ -53,9 +53,9 @@ examples = [
 ]
 
 [project.urls]
-Homepage = "https://github.com/QuantJourneyOrg/qj_bidask"
-Repository = "https://github.com/QuantJourneyOrg/qj_bidask"
-"Bug Tracker" = "https://github.com/QuantJourneyOrg/qj_bidask/issues"
+Homepage = "https://github.com/QuantJourneyOrg/quantjourney-bidask"
+Repository = "https://github.com/QuantJourneyOrg/quantjourney-bidask"
+"Bug Tracker" = "https://github.com/QuantJourneyOrg/quantjourney-bidask/issues"
 
 [tool.setuptools.packages.find]
 where = ["."]

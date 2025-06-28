@@ -1,11 +1,11 @@
 # QuantJourney Bid-Ask Spread Estimator
 
-![Build Status](https://github.com/QuantJourneyOrg/qj_bidask/actions/workflows/test.yml/badge.svg)
+![Build Status](https://github.com/QuantJourneyOrg/quantjourney-bidask/actions/workflows/test.yml/badge.svg)
 [![PyPi Version](https://img.shields.io/pypi/v/quantjourney-bidask.svg)](https://pypi.org/project/quantjourney-bidask/)
 [![Python Versions](https://img.shields.io/pypi/pyversions/quantjourney-bidask.svg)](https://pypi.org/project/quantjourney-bidask/)
 [![Downloads](https://pepy.tech/badge/quantjourney-bidask)](https://pepy.tech/project/quantjourney-bidask)
-[![License](https://img.shields.io/github/license/QuantJourneyOrg/qj_bidask.svg)](https://github.com/QuantJourneyOrg/qj_bidask/blob/main/LICENSE)
-[![GitHub Stars](https://img.shields.io/github/stars/QuantJourneyOrg/qj_bidask?style=social)](https://github.com/QuantJourneyOrg/qj_bidask)
+[![License](https://img.shields.io/github/license/QuantJourneyOrg/quantjourney-bidask.svg)](https://github.com/QuantJourneyOrg/quantjourney-bidask/blob/main/LICENSE)
+[![GitHub Stars](https://img.shields.io/github/stars/QuantJourneyOrg/quantjourney-bidask?style=social)](https://github.com/QuantJourneyOrg/quantjourney-bidask)
 
 
 The `quantjourney-bidask` library provides an efficient estimator for calculating bid-ask spreads from open, high, low, and close (OHLC) prices, based on the methodology described in:
@@ -32,13 +32,13 @@ This library is designed for quantitative finance professionals, researchers, an
 The package includes comprehensive examples with beautiful visualizations:
 
 ### Spread Monitor Results
-![Spread Monitor](https://raw.githubusercontent.com/QuantJourneyOrg/qj_bidask/refs/heads/main/_output/spread_monitor_results.png)
+![Spread Monitor](https://raw.githubusercontent.com/QuantJourneyOrg/quantjourney-bidask/refs/heads/main/_output/spread_monitor_results.png)
 
 ### Basic Data Analysis
-![Crypto Spread Analysis](https://raw.githubusercontent.com/QuantJourneyOrg/qj_bidask/ad49bd78c82ab1c44561d0f2e707ae304575a147/_output/crypto_spread_comprehensive_analysis.png)
+![Crypto Spread Analysis](https://raw.githubusercontent.com/QuantJourneyOrg/quantjourney-bidask/ad49bd78c82ab1c44561d0f2e707ae304575a147/_output/crypto_spread_comprehensive_analysis.png)
 
 ### Crypto Spread Comparison  
-![Crypto Spread Comparison](https://raw.githubusercontent.com/QuantJourneyOrg/qj_bidask/refs/heads/main/_output/crypto_spread_comparison.png)
+![Crypto Spread Comparison](https://raw.githubusercontent.com/QuantJourneyOrg/quantjourney-bidask/refs/heads/main/_output/crypto_spread_comparison.png)
 
 ## FAQ
 
@@ -93,8 +93,8 @@ pip install quantjourney-bidask
 For development (local setup):
 
 ```bash
-git clone https://github.com/QuantJourneyOrg/qj_bidask
-cd qj_bidask
+git clone https://github.com/QuantJourneyOrg/quantjourney-bidask
+cd quantjourney-bidask
 pip install -e .
 ```
 
@@ -260,8 +260,8 @@ for example in examples_path.glob('*.py'):
 Or clone the repository for full access to examples and tests:
 
 ```bash
-git clone https://github.com/QuantJourneyOrg/qj_bidask
-cd qj_bidask
+git clone https://github.com/QuantJourneyOrg/quantjourney-bidask
+cd quantjourney-bidask
 python examples/simple_data_example.py
 python examples/basic_spread_estimation.py
 python examples/animated_spread_monitor.py  # 30s real BTC websocket demo
@@ -296,8 +296,8 @@ For full development access including tests:
 
 ```bash
 # Clone the repository
-git clone https://github.com/QuantJourneyOrg/qj_bidask
-cd qj_bidask
+git clone https://github.com/QuantJourneyOrg/quantjourney-bidask
+cd quantjourney-bidask
 
 # Install in development mode
 pip install -e .
@@ -377,8 +377,8 @@ Contributions are welcome! Please feel free to submit a Pull Request. For major 
 ### Development Setup
 
 ```bash
-git clone https://github.com/QuantJourneyOrg/qj_bidask
-cd qj_bidask
+git clone https://github.com/QuantJourneyOrg/quantjourney-bidask
+cd quantjourney-bidask
 pip install -e ".[dev]"
 
 # Run tests
@@ -391,6 +391,6 @@ python examples/websocket_realtime_demo.py  # Full dashboard
 
 ## Support
 
-- **Documentation**: [GitHub Repository](https://github.com/QuantJourneyOrg/qj_bidask)
-- **Issues**: [Bug Tracker](https://github.com/QuantJourneyOrg/qj_bidask/issues)
+- **Documentation**: [GitHub Repository](https://github.com/QuantJourneyOrg/quantjourney-bidask)
+- **Issues**: [Bug Tracker](https://github.com/QuantJourneyOrg/quantjourney-bidask/issues)
 - **Contact**: jakub@quantjourney.pro
