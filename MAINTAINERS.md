@@ -8,10 +8,6 @@ This document lists the Maintainers of the Project. Maintainers may be added onc
 |------|-------------|---------|
 | Jakub Polec | Quant Journey | [LinkedIn](https://www.linkedin.com/in/jakubpolec/) |
 
-## Emeritus Maintainers
-
-None at this time.
-
 ## Adding New Maintainers
 
 To become a maintainer, you must:

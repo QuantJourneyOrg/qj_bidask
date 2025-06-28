@@ -14,6 +14,8 @@ The `quantjourney-bidask` library provides an efficient estimator for calculatin
 
 This library is designed for quantitative finance professionals, researchers, and traders who need accurate and computationally efficient spread estimates for equities, cryptocurrencies, and other assets.
 
+🚀 **Part of the [QuantJourney](https://quantjourney.substack.com/) ecosystem** - The framework with advanced quantitative finance tools and insights!
+
 ## Features
 
 - **Efficient Spread Estimation**: Implements the EDGE estimator for single, rolling, and expanding windows.
@@ -24,6 +26,62 @@ This library is designed for quantitative finance professionals, researchers, an
 - **Robust Handling**: Supports missing values, non-positive prices, and various data frequencies.
 - **Comprehensive Tests**: Extensive unit tests with known test cases from the original paper.
 - **Clear Documentation**: Detailed docstrings and usage examples.
+
+## Examples and Visualizations
+
+The package includes comprehensive examples with beautiful visualizations:
+
+### Spread Monitor Results
+![Spread Monitor](https://raw.githubusercontent.com/QuantJourneyOrg/qj_bidask/refs/heads/main/_output/spread_monitor_results.png)
+
+### Basic Data Analysis
+![Crypto Spread Analysis](https://raw.githubusercontent.com/QuantJourneyOrg/qj_bidask/ad49bd78c82ab1c44561d0f2e707ae304575a147/_output/crypto_spread_comprehensive_analysis.png)
+
+### Crypto Spread Comparison  
+![Crypto Spread Comparison](https://raw.githubusercontent.com/QuantJourneyOrg/qj_bidask/refs/heads/main/_output/crypto_spread_comparison.png)
+
+## FAQ
+
+### What exactly does the estimator compute?
+The estimator returns the root mean square effective spread over the sample period. This quantifies the average transaction cost implied by bid-ask spreads, based on open, high, low, and close (OHLC) prices.
+
+### What is unique about this implementation?
+This package includes a heavily optimized and enhanced implementation of the estimator proposed by Ardia, Guidotti, and Kroencke (2024). It features:
+
+- Robust numerical handling of non-positive or missing prices
+- Floating-point-safe comparisons using configurable epsilon
+- Vectorized log-return computations for faster evaluation
+- Improved error detection and early exits for invalid OHLC structures
+- Efficient rolling and expanding spread estimators
+
+These improvements make the estimator suitable for large-scale usage in backtesting, live monitoring, and production pipelines.
+
+### What is the minimum number of observations?
+At least 3 valid observations are required.
+
+### How should I choose the window size or frequency?
+Short windows (e.g. a few days) reflect local spread conditions but may be noisy. Longer windows (e.g. 1 year) reduce variance but smooth over changes. For intraday use, minute-level frequency is recommended if the asset trades frequently.
+
+**Rule of thumb**: ensure on average ≥2 trades per interval.
+
+### Can I use intraday or tick data?
+Yes — the estimator supports intraday OHLC data directly. For tick data, resample into OHLC format first (e.g., using pandas resample).
+
+### What if I get NaN results?
+The estimator may return NaN if:
+
+- Input prices are inconsistent (e.g. high < low)
+- There are too many missing or invalid values
+- Probability thresholds are not met (e.g. insufficient variance in prices)
+- Spread variance is non-positive
+
+In these cases, re-examine your input or adjust the sampling frequency.
+
+### What's the difference between edge() and edge_rolling()?
+- `edge()` computes a point estimate over a static sample.
+- `edge_rolling()` computes rolling window estimates, optimized for speed.
+
+Both use the same core logic and yield identical results on valid, complete data.
 
 ## Installation
 
@@ -178,19 +236,6 @@ quantjourney_bidask/
     ├── crypto_spread_comparison.png
     └── spread_estimator_results.png
 ```
-
-## Examples and Visualizations
-
-The package includes comprehensive examples with beautiful visualizations:
-
-### Basic Data Analysis
-![Crypto Spread Analysis](https://raw.githubusercontent.com/QuantJourneyOrg/qj_bidask/ad49bd78c82ab1c44561d0f2e707ae304575a147/_output/crypto_spread_comprehensive_analysis.png)
-
-### Crypto Spread Comparison  
-![Crypto Spread Comparison](https://raw.githubusercontent.com/QuantJourneyOrg/qj_bidask/refs/heads/main/_output/crypto_spread_comparison.png)
-
-### Spread Estimation Results
-![Spread Estimator Results](https://raw.githubusercontent.com/QuantJourneyOrg/qj_bidask/refs/heads/main/_output/spread_estimator_results.png)
 
 ### Running Examples
 

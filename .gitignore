@@ -242,3 +242,6 @@ PYPI_UPLOAD_GUIDE.md
 
 venv/
 .venv/
+
+# Compare edge (internal for testing)
+quantjourney_bidask/_compare_edge.py
