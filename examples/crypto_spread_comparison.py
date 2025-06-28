@@ -10,8 +10,22 @@ import pandas as pd
 import matplotlib.pyplot as plt
 import numpy as np
 import sys
-sys.path.insert(0, './data')
-from quantjourney_bidask import edge_rolling
+import os
+
+# Add parent directory to path for both installed and development mode
+try:
+    from quantjourney_bidask import edge_rolling
+    # If package is installed, we still need to add project root for data module
+    import quantjourney_bidask
+    pkg_parent = os.path.dirname(os.path.dirname(quantjourney_bidask.__file__))
+    if pkg_parent not in sys.path:
+        sys.path.insert(0, pkg_parent)
+except ImportError:
+    # Development mode - add parent directory to path
+    project_root = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+    sys.path.insert(0, project_root)
+    from quantjourney_bidask import edge_rolling
+
 from data.fetch import DataFetcher, get_crypto_data
 
 
@@ -244,7 +258,7 @@ def create_spread_comparison_plots(analysis_results):
     ax6.grid(True, alpha=0.3)
     
     plt.tight_layout()
-    plt.savefig('crypto_spread_comprehensive_analysis.png', dpi=150, bbox_inches='tight')
+    plt.savefig('_output/crypto_spread_comprehensive_analysis.png', dpi=150, bbox_inches='tight')
     print("Comprehensive analysis saved as 'crypto_spread_comprehensive_analysis.png'")
     plt.show()
 

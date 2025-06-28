@@ -1,6 +1,16 @@
 import pandas as pd
 import matplotlib.pyplot as plt
-from quantjourney_bidask import edge_rolling
+import os
+import sys
+
+# Add parent directory to path for both installed and development mode
+try:
+    from quantjourney_bidask import edge_rolling
+except ImportError:
+    # Development mode - add parent directory to path
+    sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+    from quantjourney_bidask import edge_rolling
+
 from data.fetch import DataFetcher, get_crypto_data
 
 def liquidity_risk_monitor(df, window=24, spread_zscore_threshold=2):

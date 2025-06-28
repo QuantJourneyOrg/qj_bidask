@@ -96,7 +96,7 @@ axes[1,1].set_ylabel('Spread (%)')
 axes[1,1].legend()
 
 plt.tight_layout()
-plt.savefig('spread_estimator_results.png', dpi=150, bbox_inches='tight')
+plt.savefig('_output/spread_estimator_results.png', dpi=150, bbox_inches='tight')
 print("Plot saved as 'spread_estimator_results.png'")
 plt.show()
 
@@ -138,7 +138,7 @@ try:
     
     plt.title('SPY Bid-Ask Spread and Volume (Daily, 20d Window)')
     plt.tight_layout()
-    plt.savefig('spy_spread_analysis.png', dpi=150, bbox_inches='tight')
+    plt.savefig('_output/spy_spread_analysis.png', dpi=150, bbox_inches='tight')
     print("SPY analysis plot saved as 'spy_spread_analysis.png'")
     plt.show()
     

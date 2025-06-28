@@ -1,8 +1,24 @@
 # QuantJourney Bid-Ask Spread Estimator
 
-![PyPI](https://img.shields.io/pypi/v/quantjourney-bidask)
-![License](https://img.shields.io/github/license/quantjourney/bidask)
-![Tests](https://img.shields.io/github/workflow/status/quantjourney/bidask/Test)
+|BuildStatus|_ |PyPiVersion|_ |PythonSupport|_ |Downloads|_ |License|_ |GitHub|_
+
+.. |PyPiVersion| image:: https://img.shields.io/pypi/v/quantjourney-bidask.svg
+.. _PyPiVersion: https://pypi.org/project/quantjourney-bidask/
+
+.. |PythonSupport| image:: https://img.shields.io/pypi/pyversions/quantjourney-bidask.svg
+.. _PythonSupport: https://pypi.org/project/quantjourney-bidask/
+
+.. |BuildStatus| image:: https://github.com/QuantJourneyOrg/qj_bidask/actions/workflows/test.yml/badge.svg
+.. _BuildStatus: https://github.com/QuantJourneyOrg/qj_bidask/actions
+
+.. |Downloads| image:: https://pepy.tech/badge/quantjourney-bidask
+.. _Downloads: https://pepy.tech/project/quantjourney-bidask
+
+.. |License| image:: https://img.shields.io/github/license/QuantJourneyOrg/qj_bidask.svg
+.. _License: https://github.com/QuantJourneyOrg/qj_bidask/blob/main/LICENSE
+
+.. |GitHub| image:: https://img.shields.io/github/stars/QuantJourneyOrg/qj_bidask?style=social
+.. _GitHub: https://github.com/QuantJourneyOrg/qj_bidask
 
 The `quantjourney-bidask` library provides an efficient estimator for calculating bid-ask spreads from open, high, low, and close (OHLC) prices, based on the methodology described in:
 
@@ -137,10 +153,13 @@ monitor.start_monitoring("1m")
 
 ```python
 # Run the real-time dashboard
-python examples/realtime_spread_monitor.py --mode dashboard
+python examples/websocket_realtime_demo.py --mode dashboard
 
-# Or console mode
-python examples/realtime_spread_monitor.py --mode console
+# Or console mode  
+python examples/websocket_realtime_demo.py --mode console
+
+# Quick 30-second BTC websocket demo
+python examples/animated_spread_monitor.py
 ```
 
 ## Project Structure
@@ -156,12 +175,12 @@ quantjourney_bidask/
 │   └── fetch.py                  # Simplified data fetcher for examples
 ├── examples/                     # Comprehensive usage examples
 │   ├── simple_data_example.py    # Basic usage demonstration
-│   ├── spread_estimator.py       # Spread estimation examples
+│   ├── basic_spread_estimation.py # Core spread estimation examples
 │   ├── animated_spread_monitor.py # Animated visualizations
 │   ├── crypto_spread_comparison.py # Crypto spread analysis
 │   ├── liquidity_risk_monitor.py  # Risk monitoring
-│   ├── realtime_spread_monitor.py # Live monitoring dashboard
-│   └── stock_liquidity_risk.py    # Stock liquidity analysis
+│   ├── websocket_realtime_demo.py # Live websocket monitoring demo
+│   └── threshold_alert_monitor.py # Threshold-based spread alerts
 ├── tests/                        # Unit tests (GitHub only)
 │   ├── test_edge.py
 │   ├── test_edge_rolling.py
@@ -209,19 +228,20 @@ Or clone the repository for full access to examples and tests:
 git clone https://github.com/QuantJourneyOrg/qj_bidask
 cd qj_bidask
 python examples/simple_data_example.py
-python examples/spread_estimator.py
+python examples/basic_spread_estimation.py
+python examples/animated_spread_monitor.py  # 30s real BTC websocket demo
 python examples/crypto_spread_comparison.py
 ```
 
 ### Available Examples
 
 - **`simple_data_example.py`** - Basic usage with stock and crypto data
-- **`spread_estimator.py`** - Core spread estimation functionality
-- **`animated_spread_monitor.py`** - Real-time animated visualizations
-- **`crypto_spread_comparison.py`** - Multi-asset crypto analysis
+- **`basic_spread_estimation.py`** - Core spread estimation functionality
+- **`animated_spread_monitor.py`** - Real-time animated visualizations with 30s websocket demo
+- **`crypto_spread_comparison.py`** - Multi-asset crypto analysis and comparison
 - **`liquidity_risk_monitor.py`** - Risk monitoring and alerts
-- **`realtime_spread_monitor.py`** - Live websocket monitoring dashboard
-- **`stock_liquidity_risk.py`** - Stock-specific liquidity analysis
+- **`websocket_realtime_demo.py`** - Live websocket monitoring dashboard
+- **`threshold_alert_monitor.py`** - Threshold-based spread alerts and monitoring
 
 ## Testing and Development
 
@@ -256,7 +276,8 @@ python -m pytest tests/test_data_fetcher.py -v
 
 # Run examples
 python examples/simple_data_example.py
-python examples/spread_estimator.py
+python examples/basic_spread_estimation.py
+python examples/animated_spread_monitor.py  # Real BTC websocket demo
 ```
 
 ### Package vs Repository
@@ -271,9 +292,9 @@ python examples/spread_estimator.py
 - `edge_rolling(df, window, min_periods=None)`: Rolling window estimation  
 - `edge_expanding(df, min_periods=3)`: Expanding window estimation
 
-### Data Fetching (`data/fetch.py`)
+### Data Fetching (`data/fetch.py`) - Examples & Demos
 
-- `DataFetcher()`: Main data fetcher class
+- `DataFetcher()`: Simplified data fetcher class for examples
 - `get_stock_data(ticker, period, interval)`: Fetch stock data from Yahoo Finance
 - `get_crypto_data(symbol, exchange, timeframe, limit)`: Fetch crypto data via CCXT (async)
 - `stream_btc_data(duration_seconds)`: Stream BTC data via websocket (async)
@@ -329,7 +350,8 @@ pip install -e ".[dev]"
 pytest
 
 # Run examples
-python examples/realtime_spread_monitor.py
+python examples/animated_spread_monitor.py  # 30s real BTC websocket demo
+python examples/websocket_realtime_demo.py  # Full dashboard
 ```
 
 ## Support

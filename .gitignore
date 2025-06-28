@@ -217,7 +217,6 @@ examples/*.pdf
 !_output/*.jpg
 
 # Data files (if any)
-data/
 *.csv
 *.json
 *.xlsx

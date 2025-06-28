@@ -1,4 +1,3 @@
-#!/usr/bin/env python3
 """
 Spread Monitoring Example
 
@@ -9,10 +8,14 @@ import pandas as pd
 import matplotlib.pyplot as plt
 import numpy as np
 
+import os
+import sys
+
+# Add parent directory to path
+sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+
 from quantjourney_bidask import edge_rolling
-from data.fetch import get_stock_data
-
-
+from data.fetch import DataFetcher, get_stock_data
 
 
 def spread_monitor(df, window=24, low_percentile=25, high_percentile=75):
@@ -141,7 +144,7 @@ axes[2].set_yticklabels(['Low', 'Normal', 'High'])
 axes[2].grid(True, alpha=0.3)
 
 plt.tight_layout()
-plt.savefig('spread_monitor_results.png', dpi=150, bbox_inches='tight')
+plt.savefig('_output/spread_monitor_results.png', dpi=150, bbox_inches='tight')
 print("Plot saved as 'spread_monitor_results.png'")
 plt.show()
 
@@ -194,7 +197,7 @@ try:
     plt.legend()
     plt.grid(True, alpha=0.3)
     plt.tight_layout()
-    plt.savefig('qqq_spread_monitor.png', dpi=150, bbox_inches='tight')
+    plt.savefig('_output/qqq_spread_monitor.png', dpi=150, bbox_inches='tight')
     print("QQQ monitoring plot saved as 'qqq_spread_monitor.png'")
     plt.show()
     

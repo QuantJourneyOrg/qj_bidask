@@ -1,6 +1,14 @@
 #!/usr/bin/env python3
 """
 Real-Time Spread Monitor with WebSocket Data and Synthetic Simulation.
+
+⚠️  NOTE: This example was designed for an advanced DataFetcher interface.
+    For working websocket examples, see:
+    - animated_spread_monitor.py (has working websocket demo)
+    - simple_data_example.py (basic websocket usage)
+    
+    This file demonstrates the architecture for production real-time monitoring
+    but requires additional methods in the DataFetcher class.
 """
 
 import argparse
@@ -54,14 +62,14 @@ class RealTimeSpreadMonitor:
     Monitors real-time bid-ask spreads using streaming data.
     """
 
-    def __init__(self, symbols: List[str], data_fetcher: QuantDataFetcher, window: int = 20):
+    def __init__(self, symbols: List[str], data_fetcher: DataFetcher, window: int = 20):
         """
         Initializes the RealTimeSpreadMonitor.
         """
         if not isinstance(symbols, list) or not all(isinstance(s, str) for s in symbols):
             raise TypeError("Symbols must be a list of strings.")
-        if not isinstance(data_fetcher, QuantDataFetcher):
-            raise TypeError("data_fetcher must be an instance of QuantDataFetcher.")
+        if not isinstance(data_fetcher, DataFetcher):
+            raise TypeError("data_fetcher must be an instance of DataFetcher.")
         if not isinstance(window, int) or window <= 0:
             raise ValueError("Window must be a positive integer.")
 
@@ -404,7 +412,7 @@ def main(args: argparse.Namespace):
     symbols = [s.upper() for s in args.symbols]
     use_animation = args.mode == "dashboard"
     
-    data_fetcher = QuantDataFetcher(data_dir="quant_monitor_data")
+    data_fetcher = DataFetcher(data_dir="quant_monitor_data")
 
     monitor = RealTimeSpreadMonitor(symbols, data_fetcher=data_fetcher, window=20)
     visualizer: Optional[AnimatedSpreadVisualizer] = None
@@ -501,5 +509,37 @@ if __name__ == "__main__":
     )
     args = parser.parse_args()
 
-    main(args)
+    # Check if the required methods exist, if not run a simple demo instead
+    data_fetcher = DataFetcher()
+    if not hasattr(data_fetcher, 'start_realtime_crypto_stream'):
+        print("\n" + "="*60)
+        print("🚧 SIMPLIFIED WEBSOCKET DEMO")
+        print("="*60)
+        print("The full real-time monitor requires additional DataFetcher methods.")
+        print("Running a simplified websocket demonstration instead...\n")
+        
+        import asyncio
+        
+        async def simple_websocket_demo():
+            print("📡 Starting BTC websocket stream for 15 seconds...")
+            btc_data = await data_fetcher.get_btc_1m_websocket(duration_seconds=15)
+            
+            if not btc_data.empty:
+                print(f"✅ Received {len(btc_data)} data points from websocket")
+                print("\n📊 Sample spread data:")
+                for i, row in btc_data.head(5).iterrows():
+                    spread_bps = row['spread'] * 10000
+                    print(f"  {row['timestamp'].strftime('%H:%M:%S')} | "
+                          f"Price: ${row['price']:.2f} | "
+                          f"Spread: {spread_bps:.2f} bps")
+                
+                avg_spread = btc_data['spread'].mean() * 10000
+                print(f"\n📈 Average spread: {avg_spread:.2f} basis points")
+                print("\n💡 For production monitoring, see: animated_spread_monitor.py")
+            else:
+                print("⚠️  No websocket data received")
+        
+        asyncio.run(simple_websocket_demo())
+    else:
+        main(args)
 

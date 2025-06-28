@@ -12,10 +12,14 @@ import numpy as np
 import sys
 import os
 
-# Add parent directory to path
-sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+# Add parent directory to path for both installed and development mode
+try:
+    from quantjourney_bidask import edge_rolling
+except ImportError:
+    # Development mode - add parent directory to path
+    sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+    from quantjourney_bidask import edge_rolling
 
-from quantjourney_bidask import edge_rolling
 from data.fetch import DataFetcher, get_stock_data
 
 
@@ -187,7 +191,7 @@ def create_crypto_spread_comparison():
     
     plt.suptitle('Crypto Asset Spread Comparison (Synthetic Data)', fontsize=16)
     plt.tight_layout()
-    plt.savefig('crypto_spread_comparison.png', dpi=150, bbox_inches='tight')
+    plt.savefig('_output/crypto_spread_comparison.png', dpi=150, bbox_inches='tight')
     print("Comparison plot saved as 'crypto_spread_comparison.png'")
     plt.show()
     
@@ -253,7 +257,7 @@ if __name__ == "__main__":
     ax2.legend()
     
     plt.tight_layout()
-    plt.savefig('simulated_realtime_monitor.png', dpi=150, bbox_inches='tight')
+    plt.savefig('_output/simulated_realtime_monitor.png', dpi=150, bbox_inches='tight')
     print("Static version saved as 'simulated_realtime_monitor.png'")
     plt.show()
     
@@ -283,7 +287,7 @@ if __name__ == "__main__":
         ax2.grid(True, alpha=0.3)
         
         plt.tight_layout()
-        plt.savefig('spy_realtime_monitor.png', dpi=150, bbox_inches='tight')
+        plt.savefig('_output/spy_realtime_monitor.png', dpi=150, bbox_inches='tight')
         print("SPY real-time monitor saved as 'spy_realtime_monitor.png'")
         plt.show()
         
@@ -293,9 +297,99 @@ if __name__ == "__main__":
     except Exception as e:
         print(f"Could not fetch real data: {e}")
     
+    # Example 4: Real-time websocket data (demonstration)
+    print("\n4. Testing websocket data stream...")
+    try:
+        import asyncio
+        
+        async def demo_websocket_stream():
+            fetcher = DataFetcher()
+            print("\n🚀 Starting EXTENDED BTC real-time data stream for 30 seconds...")
+            print("📊 This will show actual price movements and spread changes over time")
+            btc_stream = await fetcher.get_btc_1m_websocket(duration_seconds=30)
+            
+            if not btc_stream.empty:
+                print(f"✅ Received {len(btc_stream)} data points from real-time stream")
+                
+                # Calculate price statistics
+                start_price = btc_stream['price'].iloc[0]
+                end_price = btc_stream['price'].iloc[-1] 
+                price_change = end_price - start_price
+                price_change_pct = (price_change / start_price) * 100
+                min_price = btc_stream['price'].min()
+                max_price = btc_stream['price'].max()
+                
+                print(f"\n📈 PRICE ANALYSIS:")
+                print(f"   Start: ${start_price:.2f}")
+                print(f"   End:   ${end_price:.2f}")
+                print(f"   Change: ${price_change:+.2f} ({price_change_pct:+.3f}%)")
+                print(f"   Range: ${min_price:.2f} - ${max_price:.2f}")
+                
+                # Create enhanced visualization
+                fig, (ax1, ax2, ax3) = plt.subplots(3, 1, figsize=(14, 12))
+                
+                # Price plot with trend line
+                ax1.plot(btc_stream['timestamp'], btc_stream['price'], 'b-', linewidth=2, label='BTC Price')
+                ax1.axhline(y=start_price, color='gray', linestyle='--', alpha=0.5, label=f'Start: ${start_price:.2f}')
+                ax1.set_title(f'BTC Real-Time Price Movement (30s) - Change: {price_change_pct:+.3f}%')
+                ax1.set_ylabel('Price (USDT)')
+                ax1.grid(True, alpha=0.3)
+                ax1.legend()
+                
+                # Spread plot
+                ax2.plot(btc_stream['timestamp'], btc_stream['spread'] * 10000, 'r-', linewidth=2)
+                ax2.fill_between(btc_stream['timestamp'], 0, btc_stream['spread'] * 10000, alpha=0.3, color='red')
+                avg_spread = btc_stream['spread'].mean() * 10000
+                ax2.axhline(y=avg_spread, color='darkred', linestyle='--', label=f'Avg: {avg_spread:.2f}bps')
+                ax2.set_title('BTC Spread Evolution (Real-time)')
+                ax2.set_ylabel('Spread (basis points)')
+                ax2.grid(True, alpha=0.3)
+                ax2.legend()
+                
+                # Price change over time
+                price_changes = (btc_stream['price'] / start_price - 1) * 100
+                ax3.plot(btc_stream['timestamp'], price_changes, 'g-', linewidth=2)
+                ax3.fill_between(btc_stream['timestamp'], 0, price_changes, alpha=0.3, color='green' if price_change_pct > 0 else 'red')
+                ax3.axhline(y=0, color='black', linestyle='-', alpha=0.3)
+                ax3.set_title('Cumulative Price Change (%)')
+                ax3.set_ylabel('Change (%)')
+                ax3.set_xlabel('Time')
+                ax3.grid(True, alpha=0.3)
+                
+                plt.tight_layout()
+                plt.savefig('_output/btc_extended_realtime_demo.png', dpi=150, bbox_inches='tight')
+                print("\n💾 Enhanced real-time demo saved as 'btc_extended_realtime_demo.png'")
+                plt.show()
+                
+                # Spread statistics
+                min_spread = btc_stream['spread'].min() * 10000
+                max_spread = btc_stream['spread'].max() * 10000
+                
+                print(f"\n📊 SPREAD ANALYSIS:")
+                print(f"   Average: {avg_spread:.2f} bps")
+                print(f"   Range: {min_spread:.2f} - {max_spread:.2f} bps")
+                print(f"   Volatility: {btc_stream['spread'].std() * 10000:.2f} bps")
+                
+                # Check if it's real or synthetic data
+                is_synthetic = any('🎲' in str(row) for row in btc_stream.get('notes', []))
+                data_source = "synthetic (fallback)" if 'synthetic' in str(btc_stream.iloc[0].get('source', '')) else "real exchange data"
+                print(f"\n🔍 Data source: {data_source}")
+                
+            else:
+                print("⚠️  No data received - check network connection or CCXT installation")
+        
+        # Run the async websocket demo
+        asyncio.run(demo_websocket_stream())
+        
+    except Exception as e:
+        print(f"Websocket demo error: {e}")
+    
     print("\nAnimated spread monitor examples completed!")
-    print("\nNote: For true real-time monitoring, consider implementing:")
-    print("- WebSocket connections for live data feeds")
+    print("\n✅ Available real-time features:")
+    print("- WebSocket BTC data streaming (demonstrated above)")
+    print("- Synthetic data fallback for offline testing")
+    print("- Real-time spread calculation")
+    print("\n💡 For production real-time monitoring, consider:")
     print("- Database storage for historical data")
     print("- Alert systems for threshold breaches")
     print("- Dashboard frameworks like Dash or Streamlit")
