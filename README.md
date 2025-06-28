@@ -1,24 +1,12 @@
 # QuantJourney Bid-Ask Spread Estimator
 
-|BuildStatus|_ |PyPiVersion|_ |PythonSupport|_ |Downloads|_ |License|_ |GitHub|_
+![Build Status](https://github.com/QuantJourneyOrg/qj_bidask/actions/workflows/test.yml/badge.svg)
+[![PyPi Version](https://img.shields.io/pypi/v/quantjourney-bidask.svg)](https://pypi.org/project/quantjourney-bidask/)
+[![Python Versions](https://img.shields.io/pypi/pyversions/quantjourney-bidask.svg)](https://pypi.org/project/quantjourney-bidask/)
+[![Downloads](https://pepy.tech/badge/quantjourney-bidask)](https://pepy.tech/project/quantjourney-bidask)
+[![License](https://img.shields.io/github/license/QuantJourneyOrg/qj_bidask.svg)](https://github.com/QuantJourneyOrg/qj_bidask/blob/main/LICENSE)
+[![GitHub Stars](https://img.shields.io/github/stars/QuantJourneyOrg/qj_bidask?style=social)](https://github.com/QuantJourneyOrg/qj_bidask)
 
-.. |PyPiVersion| image:: https://img.shields.io/pypi/v/quantjourney-bidask.svg
-.. _PyPiVersion: https://pypi.org/project/quantjourney-bidask/
-
-.. |PythonSupport| image:: https://img.shields.io/pypi/pyversions/quantjourney-bidask.svg
-.. _PythonSupport: https://pypi.org/project/quantjourney-bidask/
-
-.. |BuildStatus| image:: https://github.com/QuantJourneyOrg/qj_bidask/actions/workflows/test.yml/badge.svg
-.. _BuildStatus: https://github.com/QuantJourneyOrg/qj_bidask/actions
-
-.. |Downloads| image:: https://pepy.tech/badge/quantjourney-bidask
-.. _Downloads: https://pepy.tech/project/quantjourney-bidask
-
-.. |License| image:: https://img.shields.io/github/license/QuantJourneyOrg/qj_bidask.svg
-.. _License: https://github.com/QuantJourneyOrg/qj_bidask/blob/main/LICENSE
-
-.. |GitHub| image:: https://img.shields.io/github/stars/QuantJourneyOrg/qj_bidask?style=social
-.. _GitHub: https://github.com/QuantJourneyOrg/qj_bidask
 
 The `quantjourney-bidask` library provides an efficient estimator for calculating bid-ask spreads from open, high, low, and close (OHLC) prices, based on the methodology described in:
 
