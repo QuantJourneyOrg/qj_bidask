@@ -32,7 +32,8 @@ dependencies = [
   "yfinance>=0.2",
   "matplotlib>=3.5",
   "plotly>=5.0",
-  "websocket-client>=1.0"
+  "websocket-client>=1.0",
+  "numba"
 ]
 
 [project.optional-dependencies]
@@ -43,7 +44,8 @@ dev = [
   "ruff>=0.1",
   "mypy>=1.0",
   "black>=22.0",
-  "isort>=5.0"
+  "isort>=5.0",
+  "numba"
 ]
 examples = [
   "jupyter>=1.0",
